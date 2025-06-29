@@ -6,8 +6,8 @@ vars:
 
 # ルールファイルのパスを設定
 rule-files:
-  - rules/suricata.rules # 通常のSuricataルール
-  - rules/local.rules    # カスタムルール
+  - /etc/suricata/rules/suricata.rules # 通常のSuricataルール
+  - /etc/suricata/rules/local.rules    # カスタムルール
 
 # ロギング設定 (特に eve.json はFail2banが利用)
 outputs:

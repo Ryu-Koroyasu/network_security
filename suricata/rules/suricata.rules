@@ -17,7 +17,7 @@ alert http any any -> any any (msg:"SQL Injection Attempt - UNION"; flow:to_serv
 # Rule 5: Detect common port scanning activity (example - ICMP echo request from different sources quickly)
 # Note: Full port scan detection often requires more complex stateful rules or specialized tools.
 # This is a very basic example.
-alert icmp any any -> any any (msg:"Possible Port Scan - ICMP Echo Request"; icmp_type:8; sid:200000007; rev:1; classtype:attempted-recon;)
+alert icmp any any -> any any (msg:"Possible Port Scan - ICMP Echo Request"; itype:8; sid:200000007; rev:1; classtype:attempted-recon;)
 
 # Rule 6: Detect large number of HTTP errors (e.g., 404s, might indicate content discovery scan)
 # Note: This type of rule is often better handled by log analysis (like Fail2ban) or specialized tools.
