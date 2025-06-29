@@ -1,0 +1,47 @@
+# fail2ban/jail.local
+[DEFAULT]
+# ログレベル
+loglevel = INFO
+
+# 無視するIPアドレス (localhostや内部ネットワークなど)
+ignoreip = 127.0.0.1/8 ::1
+
+# バンする期間 (秒)
+bantime = 600
+
+# 失敗回数 (これ以上失敗するとバン)
+findtime = 600
+maxretry = 5
+
+# バックエンド (systemd, polling, autoなど。autoで良いことが多い)
+backend = auto
+
+# Nginxのアクセスログを監視するJail (Suricataはログを生成する役割)
+[nginx-http-auth] # 例: NginxのBasic認証失敗を監視
+enabled = false # Suricata連携とは別なので、ここでは無効
+port = http,https
+logpath = /var/log/nginx/access.log
+# filter = nginx-http-auth # /etc/fail2ban/filter.d/nginx-http-auth.conf が必要
+
+# SuricataのEVE JSONログを監視するJail
+[suricata-alerts]
+enabled = true
+port = http,https
+# Suricataのeve.jsonのパスを絶対パスで指定
+# Docker Composeでsuricataコンテナからボリュームマウントされるパス
+logpath = /var/log/suricata/eve.json
+# 作成するフィルター名
+filter = suricata
+# Fail2banがブロックするアクション。Nginxコンテナのiptablesを操作する
+banaction = iptables-multiport
+# 接続失敗回数と検知期間
+maxretry = 1
+findtime = 10 # 短くしてすぐに反応させる
+
+# iptablesのデフォルト設定（Dockerコンテナ内部で動作させるために重要）
+# Dockerコンテナのネットワーク名前空間に作用させるには、ホストのiptablesではなく、
+# コンテナ内のiptablesを操作する必要がある。
+# ただし、これには特権モードやCAP_NET_ADMINが必要になる場合がある。
+# より高度な設定では、ホスト側のFail2banでコンテナのログを監視し、ホスト側のiptablesを操作する。
+# ここではコンテナ内Fail2banが動作し、そのコンテナのネットワークインターフェースに
+# 対してiptablesルールを設定することを想定している。

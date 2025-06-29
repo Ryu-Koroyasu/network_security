@@ -1,0 +1,48 @@
+# suricata/suricata.yaml
+# このファイルは、Suricataのデフォルト設定ファイル(suricata.yaml)の
+# 関連部分を抜粋したものなので、必要に応じて既存のsuricata.yamlを編集するか、
+# 全体をコピーして必要な部分を修正してください。
+
+# デフォルトの Suricata 設定をベースに、必要な部分のみ変更/追加
+# 以下は重要な変更点や確認点です。
+
+# HOME_NET と EXTERNAL_NET を適切に設定する (例: HOME_NETは内部ネットワーク, EXTERNAL_NETは外部)
+vars:
+  # あなたの内部ネットワークに合わせて変更
+  home_net: "[192.168.11.0/24]"
+  external_net: "any" # 外部ネットワークはanyでOK
+
+# ルールファイルのパスを設定
+rule-files:
+  - rules/suricata.rules # 通常のSuricataルール
+  - rules/local.rules    # カスタムルール
+
+# ロギング設定 (特に eve.json はFail2banが利用)
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular # または 'syslog'
+      filename: eve.json # Fail2banがこのファイルを監視する
+      # デフォルトでJSON形式、これはFail2banが解析しやすい
+      types:
+        - alert
+        - http
+        - dns
+        - tls
+        # 必要に応じて他のログタイプも追加
+
+# IDS/IPSモードの設定
+# デフォルトではIDS (検知のみ) モード
+# IPSモードを有効にするには、nfqueueなどの設定が必要
+# この構築では、SuricataはIDSとしてログを出力し、Fail2banがIPS機能を提供する
+# もしSuricata自体でパケットドロップを行いたい場合は、nfqueue等を設定し、
+# docker-compose.ymlで特権モードやcap_addでNET_ADMINを追加する必要がある。
+
+# 例: パフォーマンス設定 (環境に合わせて調整)
+# flow:
+#   memcap: 32mb
+#   hash-size: 65536
+#   prealloc: 10000
+
+# バージョンや環境によって設定項目が異なる場合があるので、
+# 使用するSuricataのバージョンに合った公式ドキュメントを参照することを強く推奨します。
