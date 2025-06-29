@@ -1,16 +1,8 @@
-# suricata/suricata.yaml
-# このファイルは、Suricataのデフォルト設定ファイル(suricata.yaml)の
-# 関連部分を抜粋したものなので、必要に応じて既存のsuricata.yamlを編集するか、
-# 全体をコピーして必要な部分を修正してください。
-
-# デフォルトの Suricata 設定をベースに、必要な部分のみ変更/追加
-# 以下は重要な変更点や確認点です。
-
-# HOME_NET と EXTERNAL_NET を適切に設定する (例: HOME_NETは内部ネットワーク, EXTERNAL_NETは外部)
+%YAML 1.1
+---
 vars:
-  # あなたの内部ネットワークに合わせて変更
-  home_net: "[192.168.11.0/24]"
-  external_net: "any" # 外部ネットワークはanyでOK
+  home-net: "[192.168.11.0/24]"
+  external-net: "any" # 外部ネットワークはanyでOK
 
 # ルールファイルのパスを設定
 rule-files:
@@ -30,6 +22,15 @@ outputs:
         - dns
         - tls
         # 必要に応じて他のログタイプも追加
+
+af-packet:
+  - interface: "eth0"
+    threads: 4
+    defrag: "yes"
+    cluster-type: cluster_flow
+    cluster-id: 99
+    copy-mode: ac-copy
+    buffer-size: 67108864
 
 # IDS/IPSモードの設定
 # デフォルトではIDS (検知のみ) モード

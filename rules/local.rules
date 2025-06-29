@@ -1,2 +1,0 @@
-# rules/local.rules
-alert http any any -> any any (msg:"ET POLICY User-Agent ABUSE - curl"; sid:2000001; rev:1; flow:to_server; content:"User-Agent|3A| curl"; nocase; http_header; classtype:policy-violation;)

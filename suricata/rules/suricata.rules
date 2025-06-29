@@ -1,0 +1,27 @@
+# Suricata Basic Rules - suricata.rules
+
+# Rule 1: Detect basic HTTP GET requests to common web server paths
+alert http any any -> any any (msg:"HTTP GET Request Detected"; flow:to_server; content:"GET"; http_method; sid:200000001; rev:1;)
+
+# Rule 2: Detect suspicious User-Agent strings (e.g., common scanning tools)
+alert http any any -> any any (msg:"Suspicious User-Agent - Nmap detected"; flow:to_server; content:"User-Agent|3A| Nmap Scripting Engine"; nocase; http_header; sid:200000002; rev:1; classtype:attempted-recon;)
+alert http any any -> any any (msg:"Suspicious User-Agent - Nikto detected"; flow:to_server; content:"User-Agent|3A| Nikto"; nocase; http_header; sid:200000003; rev:1; classtype:attempted-recon;)
+
+# Rule 3: Detect attempts to access sensitive files (e.g., .env)
+alert http any any -> any any (msg:"Attempt to access .env file"; flow:to_server; content:".env"; http_uri; nocase; sid:200000004; rev:1; classtype:attempted-recon;)
+
+# Rule 4: Detect SQL Injection attempt patterns in HTTP URI
+alert http any any -> any any (msg:"SQL Injection Attempt - Basic SQL keyword"; flow:to_server; content:"SELECT"; nocase; http_uri; sid:200000005; rev:1; classtype:attempted-user;)
+alert http any any -> any any (msg:"SQL Injection Attempt - UNION"; flow:to_server; content:"UNION"; nocase; http_uri; sid:200000006; rev:1; classtype:attempted-user;)
+
+# Rule 5: Detect common port scanning activity (example - ICMP echo request from different sources quickly)
+# Note: Full port scan detection often requires more complex stateful rules or specialized tools.
+# This is a very basic example.
+alert icmp any any -> any any (msg:"Possible Port Scan - ICMP Echo Request"; icmp_type:8; sid:200000007; rev:1; classtype:attempted-recon;)
+
+# Rule 6: Detect large number of HTTP errors (e.g., 404s, might indicate content discovery scan)
+# Note: This type of rule is often better handled by log analysis (like Fail2ban) or specialized tools.
+# This is a network-level rule example.
+# Suricata can't easily count "errors" across multiple responses for a single rule without complex state.
+# This rule below is more about detecting specific error codes in response.
+alert http any any -> any any (msg:"HTTP 404 Not Found in Response"; flow:to_client; content:"HTTP/1.1 404 Not Found"; nocase; sid:200000008; rev:1; classtype:unsuccessful-user;)

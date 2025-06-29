@@ -23,6 +23,9 @@ port = http,https
 logpath = /var/log/nginx/access.log
 # filter = nginx-http-auth # /etc/fail2ban/filter.d/nginx-http-auth.conf が必要
 
+[sshd]
+enabled = false
+
 # SuricataのEVE JSONログを監視するJail
 [suricata-alerts]
 enabled = true

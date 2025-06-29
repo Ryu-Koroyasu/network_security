@@ -35,8 +35,6 @@ services:
     container_name: suricata_ids
     # Nginxのログを監視できるようにボリュームマウント
     volumes:
-      - ./suricata/suricata.yaml:/etc/suricata/suricata.yaml:ro
-      - ./rules:/etc/suricata/rules:ro # カスタムルールをマウント
       - suricata_logs:/var/log/suricata # Suricataのログを名前付きボリュームに保存
       # SuricataがNginxのトラフィックを傍受するために、ネットワークインターフェースを監視
       # これにはホストネットワークモードか、特権モードが必要になる場合が多い
@@ -52,10 +50,10 @@ services:
       # Suricataは自身のネットワークインターフェースを監視する。
     networks:
       - internal_network # 同じネットワークに属することで、コンテナ間のトラフィックを監視可能
-    # cap_add:
-    #   - NET_ADMIN # IPSモードでNFQUEUEを使用する場合、またはネットワークデバイスを監視する場合に必要
-    #   - NET_RAW
-    # priviledged: true # より高い権限が必要な場合 (非推奨)
+    cap_add:
+      - NET_ADMIN # ネットワークインターフェース監視に必要
+      - NET_RAW   # RAWソケットの使用に必要 (IPSモードでより重要)
+      - SYS_NICE  # スケジューリング優先度設定に必要 (警告を消すため)
 
   fail2ban:
     build:
