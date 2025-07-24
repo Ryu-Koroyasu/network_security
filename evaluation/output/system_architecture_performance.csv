@@ -1,5 +1,4 @@
-Component,Uptime,Threat_Detection,Performance
-Nginx Proxy,100%,HTTP層監視,7417 req/20s
-Suricata IDS,100%,22種類ルール,48 alerts
-Fail2ban,100%,自動IP遮断,2 jails active
-Flask Backend,100%,アプリ保護,22 min稼働
+Component,Status,CPU_Usage,Memory_MB,Performance
+Nginx Proxy,running,0.0%,2.6,"Ports: ['443/tcp', '80/tcp', '8080/tcp']"
+Suricata IDS,running,0.1%,48.4,Alerts: 0
+Flask Backend,running,0.0%,20.4,Port: 5000

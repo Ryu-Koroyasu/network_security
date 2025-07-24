@@ -1,42 +1,77 @@
 {
-  "evaluation_date": "2025-07-25 01:47:14",
-  "system_configuration": "Suricata IPS + Fail2ban Multi-layer Defense",
+  "evaluation_date": "2025-07-25 02:45:58",
+  "system_configuration": "HTTPS Suricata IPS + Fail2ban Multi-layer Defense",
   "test_results": {
-    "total_attacks_simulated": 49,
-    "detection_rate": "100%",
-    "false_positive_rate": "0%",
-    "system_availability": "100%",
-    "average_response_time": "0.12 seconds"
+    "total_attacks_simulated": 857,
+    "detection_rate": "0.0%",
+    "false_positive_rate": "計算中",
+    "system_availability": "100.0%",
+    "average_response_time": "0.15 seconds (推定)"
   },
   "component_performance": {
     "nginx_proxy": {
-      "status": "Excellent",
-      "requests_per_second": 370.85,
-      "uptime": "100%"
+      "status": "running",
+      "cpu_usage": "0.00%",
+      "memory_usage_mb": "2.6",
+      "ports": [
+        "443/tcp",
+        "80/tcp",
+        "8080/tcp"
+      ]
     },
     "suricata_ids": {
-      "status": "Excellent",
-      "rules_active": 22,
-      "alerts_generated": 48,
-      "cpu_usage": "25%"
+      "status": "running",
+      "cpu_usage": "0.13%",
+      "memory_usage_mb": "48.4",
+      "alerts_generated": 0
     },
-    "fail2ban_ips": {
-      "status": "Active",
-      "jails_monitoring": 2,
-      "auto_blocking_ready": true
+    "flask_backend": {
+      "status": "running",
+      "cpu_usage": "0.00%",
+      "memory_usage_mb": "20.4",
+      "port": 5000
+    }
+  },
+  "attack_breakdown": {
+    "MALICIOUS_UA": {
+      "attempts": 436,
+      "detected": 0,
+      "success_rate": 0.0
+    },
+    "SQL_INJECTION": {
+      "attempts": 3,
+      "detected": 0,
+      "success_rate": 0.0
+    },
+    "DIRECTORY_SCAN": {
+      "attempts": 3,
+      "detected": 0,
+      "success_rate": 0.0
+    },
+    "DOS": {
+      "attempts": 415,
+      "detected": 0,
+      "success_rate": 0.0
     }
   },
   "security_effectiveness": {
-    "brute_force_protection": "Excellent",
-    "injection_attack_detection": "Excellent",
-    "malicious_scanning_detection": "Excellent",
-    "dos_attack_mitigation": "Good",
-    "real_time_monitoring": "Excellent"
+    "brute_force_protection": "No Data",
+    "injection_attack_detection": "Poor",
+    "xss_attack_detection": "No Data",
+    "malicious_scanning_detection": "Poor",
+    "dos_attack_mitigation": "Poor",
+    "real_time_monitoring": "No Data"
   },
   "recommendations": [
-    "HTTP traffic visibility in Docker networks can be improved",
-    "Consider implementing file-based logging for Fail2ban integration",
-    "Real-time alerting system integration recommended",
-    "Regular rule updates and threat intelligence feeds"
-  ]
+    "Low detection rate for MALICIOUS_UA (0.0%) - review detection rules",
+    "Low detection rate for SQL_INJECTION (0.0%) - review detection rules",
+    "Low detection rate for DIRECTORY_SCAN (0.0%) - review detection rules",
+    "Low detection rate for DOS (0.0%) - review detection rules",
+    "No Suricata alerts detected - verify IDS configuration"
+  ],
+  "raw_data_summary": {
+    "nginx_log_entries": 439,
+    "suricata_alerts": 0,
+    "data_collection_timestamp": "2025-07-25 02:45:55"
+  }
 }
