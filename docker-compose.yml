@@ -8,10 +8,12 @@ services:
     # NginxのアクセスログとエラーログをSuricataとFail2banが共有できるようにボリュームマウント
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro  # SSL証明書をマウント
       - nginx_logs:/var/log/nginx # Nginxのログを名前付きボリュームに保存
     ports:
-      - "8080:8080"
-      - "443:443" # HTTPSが必要な場合
+      - "80:80"     # HTTPからHTTPSへのリダイレクト用
+      - "8080:8080" # HTTP（レガシー対応）
+      - "443:443"   # HTTPS
     networks:
       - internal_network
       - external_network # 外部からのアクセスを受けるネットワーク

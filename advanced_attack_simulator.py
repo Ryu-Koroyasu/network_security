@@ -15,9 +15,23 @@ from urllib.parse import urljoin
 from concurrent.futures import ThreadPoolExecutor
 
 class AttackSimulator:
-    def __init__(self, target_url="http://localhost:8080"):
+    def __init__(self, target_url="https://localhost:443", insecure=True):
         self.target_url = target_url
+        self.insecure = insecure  # 自己署名証明書を許可
         self.attack_results = []
+        
+        # HTTPSの場合、SSL証明書検証を無効化（テスト環境用）
+        if insecure:
+            import urllib3
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            requests.packages.urllib3.disable_warnings()
+        
+    def get_session(self):
+        """SSL検証設定済みのセッションを取得"""
+        session = requests.Session()
+        if self.insecure:
+            session.verify = False
+        return session
         
     def log_result(self, attack_type, status, details=""):
         """攻撃結果をログに記録"""
@@ -43,7 +57,8 @@ class AttackSimulator:
             
             try:
                 # Basic認証での攻撃をシミュレート
-                response = requests.get(
+                session = self.get_session()
+                response = session.get(
                     f"{self.target_url}/admin",
                     auth=(username, password),
                     timeout=5,
@@ -76,7 +91,8 @@ class AttackSimulator:
         for payload in payloads:
             try:
                 params = {'id': payload, 'search': payload}
-                response = requests.get(
+                session = self.get_session()
+                response = session.get(
                     f"{self.target_url}/search",
                     params=params,
                     timeout=5,
