@@ -1,5 +1,5 @@
 {
-  "evaluation_date": "2025-07-17T23:39:04.953506",
+  "evaluation_date": "2025-07-25T01:51:44.431918",
   "system_summary": {
     "total_memory_usage_mb": 103.0,
     "total_cpu_usage_percent": 1.0,
@@ -10,7 +10,7 @@
     "total_attacks_tested": 23,
     "total_attacks_detected": 21,
     "overall_detection_rate": 91.30434782608695,
-    "average_response_time": 1.207013003957747,
+    "average_response_time": 1.1457766113662686,
     "false_positive_rate": 0.0
   },
   "attack_types_tested": [

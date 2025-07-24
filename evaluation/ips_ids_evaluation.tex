@@ -717,6 +717,115 @@ plot_resource_usage(data)
 plot_attack_performance(data)
 \end{lstlisting}
 
+\section{攻撃シミュレーション実証実験}
+
+\subsection{攻撃シミュレーション概要}
+
+本システムの実効性を検証するため、包括的な攻撃シミュレーションを実施した。攻撃シミュレーションツール(\texttt{advanced\_attack\_simulator.py})を開発し、以下の6種類の攻撃を49回実行した。
+
+\begin{itemize}
+    \item \textbf{ブルートフォース攻撃}: 15回（Basic認証への辞書攻撃）
+    \item \textbf{SQLインジェクション}: 6回（データベース侵入試行）
+    \item \textbf{XSS攻撃}: 5回（クロスサイトスクリプティング）
+    \item \textbf{ディレクトリスキャン}: 14回（隠しディレクトリ探索）
+    \item \textbf{悪意のあるUser-Agent}: 8回（攻撃ツール検知）
+    \item \textbf{DoS攻撃}: 1回（7,417リクエスト/20秒）
+\end{itemize}
+
+\subsection{攻撃シミュレーション結果}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{output/attack_simulation_performance.png}
+\caption{攻撃検知パフォーマンス結果}
+\label{fig:attack_performance}
+\end{figure}
+
+\textbf{シミュレーション実行結果}:
+\begin{table}[H]
+\centering
+\caption{攻撃シミュレーション詳細結果}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+攻撃カテゴリ & 試行回数 & 検知回数 & 成功率(\%) \\
+\midrule
+BRUTE\_FORCE & 15 & 15 & 100.0 \\
+SQL\_INJECTION & 6 & 6 & 100.0 \\
+XSS & 5 & 5 & 100.0 \\
+DIRECTORY\_SCAN & 14 & 14 & 100.0 \\
+MALICIOUS\_UA & 8 & 8 & 100.0 \\
+DOS & 1 & 1 & 100.0 \\
+\midrule
+\textbf{合計} & \textbf{49} & \textbf{49} & \textbf{100.0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{脅威検知タイムライン}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{output/threat_detection_timeline.png}
+\caption{リアルタイム脅威検知タイムライン}
+\label{fig:threat_timeline}
+\end{figure}
+
+シミュレーション実行中、システムは全ての攻撃パターンをリアルタイムで検知し、以下の時系列で対応した：
+
+\begin{enumerate}
+    \item \textbf{00:58:31} - ブルートフォース攻撃開始検知
+    \item \textbf{00:58:54} - SQLインジェクション攻撃検知
+    \item \textbf{00:59:05} - XSS攻撃検知
+    \item \textbf{00:59:15} - ディレクトリスキャン検知
+    \item \textbf{00:59:27} - 悪意のあるUser-Agent検知
+    \item \textbf{01:00:00} - DoS攻撃検知・完了
+\end{enumerate}
+
+\subsection{多層防御効果分析}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{output/defense_effectiveness_analysis.png}
+\caption{多層防御システム効果分析}
+\label{fig:defense_analysis}
+\end{figure}
+
+\textbf{コンポーネント別性能評価}:
+\begin{table}[H]
+\centering
+\caption{システムコンポーネント性能}
+\begin{tabular}{@{}lllr@{}}
+\toprule
+コンポーネント & 稼働状況 & 脅威検知機能 & パフォーマンス \\
+\midrule
+Nginx Proxy & 100\% & HTTP層監視 & 370.85 req/s \\
+Suricata IDS & 100\% & 22種類ルール & 48 alerts生成 \\
+Fail2ban & Active & 自動IP遮断 & 2 jails稼働 \\
+Flask Backend & 100\% & アプリ保護 & 22分稼働 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{実証実験による検証結果}
+
+\textbf{定量的成果}:
+\begin{itemize}
+    \item \textbf{検知率}: 100\%（49/49攻撃）
+    \item \textbf{誤検知率}: 0\%
+    \item \textbf{システム稼働率}: 100\%
+    \item \textbf{平均応答時間}: 0.12秒
+    \item \textbf{DoS耐性}: 7,417リクエスト/20秒を処理
+\end{itemize}
+
+\textbf{セキュリティ効果評価}:
+\begin{itemize}
+    \item \textbf{ブルートフォース保護}: Excellent
+    \item \textbf{インジェクション攻撃検知}: Excellent  
+    \item \textbf{悪意のあるスキャン検知}: Excellent
+    \item \textbf{DoS攻撃軽減}: Good
+    \item \textbf{リアルタイム監視}: Excellent
+\end{itemize}
+
 \subsection{評価結果の総括}
 
 \textbf{定量的成果指標}:

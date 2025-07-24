@@ -17,7 +17,7 @@ all: data pdf
 # 評価データ生成
 data:
 	@echo "評価データを生成中..."
-	../../../.venv/bin/python $(DATA_SCRIPT)
+	../.venv/bin/python $(DATA_SCRIPT)
 
 # PDFコンパイル
 pdf: $(PDF_FILE)
