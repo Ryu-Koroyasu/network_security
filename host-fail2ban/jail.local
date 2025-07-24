@@ -1,0 +1,82 @@
+# /etc/fail2ban/jail.local - ホストOS用設定
+[DEFAULT]
+# ログレベル
+loglevel = INFO
+
+# 無視するIPアドレス (localhostや内部ネットワークなど)
+ignoreip = 127.0.0.1/8 ::1 172.17.0.0/16 172.18.0.0/16
+
+# バンする期間 (秒)
+bantime = 3600  # 1時間
+
+# 失敗回数 (これ以上失敗するとバン)
+findtime = 600  # 10分間で
+maxretry = 3    # 3回失敗でブロック
+
+# バックエンド
+backend = auto
+
+# デフォルトのアクション
+banaction = iptables-multiport
+action = %(action_mwl)s
+
+# SSH保護（デフォルト有効）
+[sshd]
+enabled = true
+port = ssh
+logpath = /var/log/auth.log
+maxretry = 3
+
+# Nginxアクセスログ監視（Dockerボリューム経由）
+[nginx-http-auth]
+enabled = true
+port = http,https
+logpath = /var/lib/docker/volumes/network_security_nginx_logs/_data/access.log
+filter = nginx-http-auth
+maxretry = 5
+findtime = 600
+
+[nginx-noscript]
+enabled = true
+port = http,https
+logpath = /var/lib/docker/volumes/network_security_nginx_logs/_data/access.log
+filter = nginx-noscript
+maxretry = 6
+findtime = 600
+
+[nginx-badbots]
+enabled = true
+port = http,https
+logpath = /var/lib/docker/volumes/network_security_nginx_logs/_data/access.log
+filter = nginx-badbots
+maxretry = 2
+findtime = 600
+
+[nginx-noproxy]
+enabled = true
+port = http,https
+logpath = /var/lib/docker/volumes/network_security_nginx_logs/_data/access.log
+filter = nginx-noproxy
+maxretry = 2
+findtime = 600
+
+# SuricataのEVE JSONログ監視（Dockerボリューム経由）
+[suricata-alerts]
+enabled = true
+port = http,https
+# DockerボリュームのSuricataログを監視
+logpath = /var/lib/docker/volumes/network_security_suricata_logs/_data/eve.json
+filter = suricata-fast
+maxretry = 1  # 1回のアラートでブロック
+findtime = 60
+bantime = 7200  # 2時間ブロック
+
+# 重大度の高いSuricataアラート
+[suricata-severe]
+enabled = true
+port = http,https
+logpath = /var/lib/docker/volumes/network_security_suricata_logs/_data/eve.json
+filter = suricata-severe
+maxretry = 1
+findtime = 60
+bantime = 86400  # 24時間ブロック

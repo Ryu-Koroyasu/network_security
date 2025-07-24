@@ -33,61 +33,22 @@ services:
       context: ./suricata
       dockerfile: Dockerfile # Suricata用のDockerfile
     container_name: suricata_ids
-    # Nginxのログを監視できるようにボリュームマウント
+    # SuricataのIDSモード（ネットワーク監視）
     volumes:
-      - suricata_logs:/var/log/suricata # Suricataのログを名前付きボリュームに保存
-      # SuricataがNginxのトラフィックを傍受するために、ネットワークインターフェースを監視
-      # これにはホストネットワークモードか、特権モードが必要になる場合が多い
-      # この設定では、NginxのログファイルをFail2banが監視し、そのログイベントに基づいて
-      # SuricataのログをFail2banが処理するようにしているため、
-      # ここで直接Nginxのネットワークを監視する必要はない。
-      # むしろ、NginxのアクセスログをSuricataが直接処理するのではなく、Fail2banが処理し、
-      # Suricataはネットワークレベルの検知に特化させるのが一般的。
-      # 今回の構成では「NginxのアクセスログからSuricataがログを生成し、Fail2banがそのログを検知」
-      # というよりは「Suricataがネットワークを検知し、そのログをFail2banが処理してブロック」
-      # という流れの方が自然。
-      # なので、nginx_logsをsuricata_logsにマウントして共有はしない。
-      # Suricataは自身のネットワークインターフェースを監視する。
+      - suricata_logs:/var/log/suricata
     networks:
       - internal_network # 同じネットワークに属することで、コンテナ間のトラフィックを監視可能
     cap_add:
       - NET_ADMIN # ネットワークインターフェース監視に必要
-      - NET_RAW   # RAWソケットの使用に必要 (IPSモードでより重要)
-      - SYS_NICE  # スケジューリング優先度設定に必要 (警告を消すため)
-
-  fail2ban:
-    build:
-      context: ./fail2ban
-      dockerfile: Dockerfile # Fail2ban用のDockerfile
-    container_name: fail2ban_ips
-    # ホストのiptablesを操作するために特権モードとホストのネットワークアクセスが必要
-    # この設定は**非常に重要**であり、セキュリティリスクを伴うため注意して使用すること
-    # ホストOSのiptablesを操作するには、ホストのDBUSとソケットにアクセスする必要がある
-    # または、ホスト側にFail2banを直接インストールし、コンテナのログをホストから監視する方が安全
-    # ここでは、コンテナ内のFail2banがホストのiptablesを操作する理想的な設定を仮定
-    # しかし、Dockerのセキュリティモデルではこれを直接実現することは困難。
-    # 通常は、Fail2banをホストにインストールし、Dockerコンテナのログをホストにマウントして監視する。
-    # ここでは、あくまでコンテナ内でFail2banを動かすための最小限の設定を記述。
-    # 現実的な運用ではホスト側でFail2banを実行する方が良い。
-    cap_add:
-      - NET_ADMIN # iptables操作に必要
-    network_mode: host # ホストのネットワーク名前空間を共有
-    volumes:
-      - ./fail2ban/jail.local:/etc/fail2ban/jail.local:ro
-      - ./fail2ban/suricata.conf:/etc/fail2ban/filter.d/suricata.conf:ro
-      # SuricataのログをFail2banが読み込めるようにマウント
-      - suricata_logs:/var/log/suricata:ro
-      - fail2ban_logs:/var/log/fail2ban
-      # ホストの /var/log をマウントすることで、ホストのログも監視できる
-      # - /var/log:/var/log:ro
-    depends_on:
-      - suricata # Suricataが先に起動していることを保証
+      - NET_RAW   # RAWソケットの使用に必要
+      - SYS_NICE  # スケジューリング優先度設定に必要
+    restart: unless-stopped
 
 # 永続化のためのボリューム定義
 volumes:
   nginx_logs: # Nginxログ用
   suricata_logs: # Suricataログ用
-  fail2ban_logs: # Fail2banログ用
+  # fail2ban_logs: # Fail2banはホストOSにインストールするため削除
 
 # ネットワーク定義
 networks:

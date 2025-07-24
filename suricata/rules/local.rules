@@ -19,7 +19,7 @@ alert http any any -> any any (msg:"Directory Traversal"; content:"../"; http_ur
 alert http any any -> any any (msg:"Path Traversal - etc/passwd"; content:"/etc/passwd"; nocase; http_uri; sid:1000008; rev:1;)
 alert http any any -> any any (msg:"Path Traversal - Encoded"; content:"%2e%2e%2f"; http_uri; sid:1000011; rev:1;)
 alert http any any -> any any (msg:"Path Traversal - Double Encoded"; content:"%252e%252e%252f"; http_uri; sid:1000012; rev:1;)
-alert http any any -> any any (msg:"Path Traversal - Dot Dot Slash"; pcre:"/\.\.\//"; http_uri; sid:1000013; rev:1;)
+alert http any any -> any any (msg:"Path Traversal - Dot Dot Slash"; content:"../"; http_uri; sid:1000013; rev:1;)
 
 # 怪しいファイルアクセス
 alert http any any -> any any (msg:"Sensitive File Access"; content:"/etc/shadow"; nocase; http_uri; sid:1000009; rev:1;)

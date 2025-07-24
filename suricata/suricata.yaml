@@ -1,49 +1,82 @@
 %YAML 1.1
 ---
 vars:
-  home-net: "[192.168.11.0/24]"
-  external-net: "any" # 外部ネットワークはanyでOK
+  home-net: "[192.168.0.0/16,10.0.0.0/8,172.16.0.0/12]"
+  external-net: "!$HOME_NET"
 
 # ルールファイルのパスを設定
 rule-files:
   - /etc/suricata/rules/suricata.rules # 通常のSuricataルール
   - /etc/suricata/rules/local.rules    # カスタムルール
 
+# ネットワークインターフェース設定（IDSモード）
+af-packet:
+  - interface: eth0
+    threads: auto
+    defrag: yes
+    cluster-type: cluster_flow
+    cluster-id: 99
+    copy-mode: ids
+    buffer-size: 67108864
+
 # ロギング設定 (特に eve.json はFail2banが利用)
 outputs:
   - eve-log:
       enabled: yes
-      filetype: regular # または 'syslog'
-      filename: eve.json # Fail2banがこのファイルを監視する
-      # デフォルトでJSON形式、これはFail2banが解析しやすい
+      filetype: regular
+      filename: eve.json
       types:
-        - alert
-        - http
-        - dns
-        - tls
-        # 必要に応じて他のログタイプも追加
+        - alert:
+            payload: yes
+            packet: yes
+            metadata: yes
+        - drop:
+            alerts: yes
+        - http:
+            extended: yes
+        - dns:
+            query: yes
+            answer: yes
+        - tls:
+            extended: yes
+        - flow
+        - netflow
 
-af-packet:
-  - interface: "eth0"
-    threads: 4
-    defrag: "yes"
-    cluster-type: cluster_flow
-    cluster-id: 99
-    copy-mode: ac-copy
-    buffer-size: 67108864
+# Engine mode: autofp（自動最適化）
+runmode: autofp
 
-# IDS/IPSモードの設定
-# デフォルトではIDS (検知のみ) モード
-# IPSモードを有効にするには、nfqueueなどの設定が必要
-# この構築では、SuricataはIDSとしてログを出力し、Fail2banがIPS機能を提供する
-# もしSuricata自体でパケットドロップを行いたい場合は、nfqueue等を設定し、
-# docker-compose.ymlで特権モードやcap_addでNET_ADMINを追加する必要がある。
+# 検知エンジン設定
+detect:
+  profile: medium
+  custom-values:
+    toclient-groups: 3
+    toserver-groups: 25
 
-# 例: パフォーマンス設定 (環境に合わせて調整)
-# flow:
-#   memcap: 32mb
-#   hash-size: 65536
-#   prealloc: 10000
+# フロー設定
+flow:
+  memcap: 128mb
+  hash-size: 65536
+  prealloc: 10000
+  emergency-recovery: 30
 
-# バージョンや環境によって設定項目が異なる場合があるので、
-# 使用するSuricataのバージョンに合った公式ドキュメントを参照することを強く推奨します。
+# ストリーム設定
+stream:
+  memcap: 64mb
+  checksum-validation: yes
+  reassembly:
+    memcap: 64mb
+    depth: 1mb
+    toserver-chunk-size: 2560
+    toclient-chunk-size: 2560
+
+# パフォーマンス設定
+threading:
+  set-cpu-affinity: no
+  cpu-affinity:
+    - management-cpu-set:
+        cpu: [ 0 ]
+    - receive-cpu-set:
+        cpu: [ 0 ]
+    - worker-cpu-set:
+        cpu: [ "all" ]
+  detect-thread-ratio: 1.0

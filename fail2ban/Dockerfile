@@ -11,4 +11,6 @@ VOLUME /var/log/fail2ban
 
 # Fail2banサーバーを起動し、そのログを標準出力にフォアグラウンドで流し続ける
 # これにより、コンテナは終了せず、docker logs で Fail2banの動作状況が見れる
-CMD ["/bin/bash", "-c", "fail2ban-client start && tail -F /var/log/fail2ban/fail2ban.log"]
+# 起動前にソケットファイルをクリーンアップし、ログファイルを作成
+# fail2ban-serverを直接フォアグラウンドで起動することでより安定した動作を実現
+CMD ["/bin/bash", "-c", "rm -f /var/run/fail2ban/fail2ban.sock && mkdir -p /var/run/fail2ban && touch /var/log/fail2ban/fail2ban.log && exec fail2ban-server -f"]

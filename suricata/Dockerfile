@@ -15,6 +15,6 @@ COPY rules/ /etc/suricata/rules/
 RUN mkdir -p /var/log/suricata
 VOLUME /var/log/suricata # ログは永続化のためボリュームマウントを維持
 
-# Suricataを起動するためのCMD。-i eth0 でコンテナのプライマリネットワークインターフェースを監視
-# eth0 はDockerブリッジネットワーク内の一般的なインターフェース名です
-CMD ["suricata", "-c", "/etc/suricata/suricata.yaml", "-i", "eth0", "--runmode", "autofp"]
+# まずはIDSモードで動作（ネットワークインターフェース監視）
+# IPSモードは段階的に実装
+CMD ["suricata", "-c", "/etc/suricata/suricata.yaml", "-i", "eth0", "--runmode", "autofp", "-v"]
