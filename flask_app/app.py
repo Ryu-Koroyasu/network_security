@@ -15,6 +15,9 @@ def health_check():
 @app.route('/test')
 def test_endpoint():
     """テスト用エンドポイント - Suricataルールでキャッチされる"""
+    file_param = request.args.get('file', '')
+    if file_param:
+        return f'Test endpoint accessed with file parameter: {file_param}', 200
     return 'Test endpoint accessed', 200
 
 @app.route('/admin')

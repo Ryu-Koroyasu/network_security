@@ -1,0 +1,35 @@
+% LaTeX論文用テーブルデータ
+
+% 基本性能テーブル
+\begin{table}[H]
+\centering
+\caption{システムリソース使用量詳細}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+コンテナ & CPU使用率(\%) & メモリ使用量(MB) & 起動時間(秒) \\
+\midrule
+nginx_proxy & 0.1 & 3.2 & 2.1 \\
+flask_app & 0.2 & 15.4 & 3.5 \\
+suricata_ids & 0.6 & 76.3 & 8.2 \\
+fail2ban_ips & 0.1 & 8.1 & 4.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% 攻撃検知性能テーブル
+\begin{table}[H]
+\centering
+\caption{攻撃検知性能詳細}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+攻撃タイプ & 実行回数 & 検知回数 & 検知率(\%) & 応答時間(秒) \\
+\midrule
+curl_user_agent & 3 & 3 & 100.0 & 0.2 \\
+wget_user_agent & 3 & 3 & 100.0 & 0.2 \\
+path_traversal & 2 & 0 & 0.0 & 0.2 \\
+sql_injection & 5 & 5 & 100.0 & 2.3 \\
+admin_access & 5 & 5 & 100.0 & 2.3 \\
+brute_force & 5 & 5 & 100.0 & 2.2 \\
+\bottomrule
+\end{tabular}
+\end{table}
