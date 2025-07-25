@@ -1,0 +1,4 @@
+Component,Status,CPU_Usage,Memory_MB,Performance
+Nginx Proxy,running,0.0%,9.5,"Ports: ['443/tcp', '80/tcp', '8080/tcp']"
+Suricata IDS,running,0.0%,131.4,Alerts: 107
+Flask Backend,running,0.0%,21.5,Port: 5000

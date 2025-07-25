@@ -1,0 +1,87 @@
+{
+  "evaluation_date": "2025-07-25 03:29:03",
+  "system_configuration": "HTTPS Suricata IPS + Fail2ban Multi-layer Defense",
+  "test_results": {
+    "total_attacks_simulated": 877,
+    "detection_rate": "12.2%",
+    "false_positive_rate": "計算中",
+    "system_availability": "100.0%",
+    "average_response_time": "0.15 seconds (推定)"
+  },
+  "component_performance": {
+    "nginx_proxy": {
+      "status": "running",
+      "cpu_usage": "0.00%",
+      "memory_usage_mb": "9.5",
+      "ports": [
+        "443/tcp",
+        "80/tcp",
+        "8080/tcp"
+      ]
+    },
+    "suricata_ids": {
+      "status": "running",
+      "cpu_usage": "0.04%",
+      "memory_usage_mb": "131.4",
+      "alerts_generated": 107
+    },
+    "flask_backend": {
+      "status": "running",
+      "cpu_usage": "0.00%",
+      "memory_usage_mb": "21.5",
+      "port": 5000
+    }
+  },
+  "attack_breakdown": {
+    "DOS": {
+      "attempts": 408,
+      "detected": 2,
+      "success_rate": 0.49019607843137253
+    },
+    "SQL_INJECTION": {
+      "attempts": 16,
+      "detected": 2,
+      "success_rate": 12.5
+    },
+    "MALICIOUS_UA": {
+      "attempts": 414,
+      "detected": 100,
+      "success_rate": 24.154589371980677
+    },
+    "BRUTE_FORCE": {
+      "attempts": 34,
+      "detected": 2,
+      "success_rate": 5.88235294117647
+    },
+    "DIRECTORY_SCAN": {
+      "attempts": 4,
+      "detected": 0,
+      "success_rate": 0.0
+    },
+    "XSS": {
+      "attempts": 1,
+      "detected": 1,
+      "success_rate": 100.0
+    }
+  },
+  "security_effectiveness": {
+    "brute_force_protection": "Poor",
+    "injection_attack_detection": "Poor",
+    "xss_attack_detection": "Excellent",
+    "malicious_scanning_detection": "Poor",
+    "dos_attack_mitigation": "Poor",
+    "real_time_monitoring": "Excellent"
+  },
+  "recommendations": [
+    "Low detection rate for DOS (0.5%) - review detection rules",
+    "Low detection rate for SQL_INJECTION (12.5%) - review detection rules",
+    "Low detection rate for MALICIOUS_UA (24.2%) - review detection rules",
+    "Low detection rate for BRUTE_FORCE (5.9%) - review detection rules",
+    "Low detection rate for DIRECTORY_SCAN (0.0%) - review detection rules"
+  ],
+  "raw_data_summary": {
+    "nginx_log_entries": 438,
+    "suricata_alerts": 107,
+    "data_collection_timestamp": "2025-07-25 03:29:02"
+  }
+}

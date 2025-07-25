@@ -3,18 +3,22 @@
 # ログレベル
 loglevel = INFO
 
-# 無視するIPアドレス (localhostや内部ネットワークなど)
+# 無視するIPアドレス (localhostのみ、外部テストを可能にするため)
 ignoreip = 127.0.0.1/8 ::1
 
 # バンする期間 (秒) - より長期間に変更
 bantime = 3600
 
 # 失敗回数 (これ以上失敗するとバン) - より厳格に
-findtime = 300
-maxretry = 3
+findtime = 60
+maxretry = 1
 
 # バックエンド
 backend = auto
+
+# ===== Disable default jails =====
+[sshd]
+enabled = false
 
 # ===== Enhanced Security Jails =====
 

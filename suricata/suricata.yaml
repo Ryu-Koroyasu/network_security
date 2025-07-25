@@ -1,7 +1,7 @@
 %YAML 1.1
 ---
 vars:
-  home-net: "[192.168.0.0/16,10.0.0.0/8,172.16.0.0/12]"
+  home-net: "[192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,127.0.0.0/8]"
   external-net: "!$HOME_NET"
 
 # ルールファイルのパスを設定
@@ -9,13 +9,27 @@ rule-files:
   - /etc/suricata/rules/suricata.rules # 通常のSuricataルール
   - /etc/suricata/rules/local.rules    # カスタムルール
 
-# ネットワークインターフェース設定（IDSモード）
+# ネットワークインターフェース設定（ホストネットワーク監視）
 af-packet:
-  - interface: eth0
+  - interface: any  # 全インターフェースを監視
     threads: auto
     defrag: yes
     cluster-type: cluster_flow
     cluster-id: 99
+    copy-mode: ids
+    buffer-size: 67108864
+  - interface: docker0  # Dockerのデフォルトブリッジ
+    threads: auto
+    defrag: yes
+    cluster-type: cluster_flow
+    cluster-id: 98
+    copy-mode: ids
+    buffer-size: 67108864
+  - interface: eth0  # メインインターフェース
+    threads: auto
+    defrag: yes
+    cluster-type: cluster_flow
+    cluster-id: 97
     copy-mode: ids
     buffer-size: 67108864
 

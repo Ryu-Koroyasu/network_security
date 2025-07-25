@@ -15,6 +15,5 @@ COPY rules/ /etc/suricata/rules/
 RUN mkdir -p /var/log/suricata
 VOLUME /var/log/suricata # ログは永続化のためボリュームマウントを維持
 
-# まずはIDSモードで動作（ネットワークインターフェース監視）
-# IPSモードは段階的に実装
+# IPSモードで動作（AF_PACKET copy-mode=ips）
 CMD ["suricata", "-c", "/etc/suricata/suricata.yaml", "-i", "eth0", "--runmode", "autofp", "-v"]

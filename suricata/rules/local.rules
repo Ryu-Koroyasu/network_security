@@ -1,52 +1,61 @@
 # rules/local.rules
 
+# ===== IPS Mode Rules (with DROP actions) =====
+# 重要：drop アクションは実際にパケットをブロックします
+
 # ===== SSL/TLS Security Rules =====
 # 古いSSLバージョンの検知
-alert tls any any -> any any (msg:"SSL/TLS - Deprecated SSL version detected"; tls.version:<"TLS 1.2"; sid:3000001; rev:1; classtype:protocol-command-decode;)
+drop tls any any -> any any (msg:"SSL/TLS - Deprecated SSL version detected"; tls.version:<"TLS 1.2"; sid:3000001; rev:1; classtype:protocol-command-decode;)
 # 弱い暗号化の検知
-alert tls any any -> any any (msg:"SSL/TLS - Weak cipher suite detected"; tls.subject:"MD5"; sid:3000002; rev:1; classtype:protocol-command-decode;)
+drop tls any any -> any any (msg:"SSL/TLS - Weak cipher suite detected"; tls.subject:"MD5"; sid:3000002; rev:1; classtype:protocol-command-decode;)
 
 # ===== HTTP Security Rules =====
-# User-Agent ベースの検知（拡張）
-alert http any any -> any any (msg:"ET POLICY User-Agent ABUSE - curl"; sid:2000001; rev:1; flow:to_server; content:"User-Agent|3A| curl"; nocase; http_header; classtype:policy-violation;)
-alert http any any -> any any (msg:"ET POLICY User-Agent ABUSE - wget"; sid:2000002; rev:1; flow:to_server; content:"User-Agent|3A| wget"; nocase; http_header; classtype:policy-violation;)
-alert http any any -> any any (msg:"ET POLICY User-Agent ABUSE - python-requests"; sid:2000003; rev:1; flow:to_server; content:"User-Agent|3A| python-requests"; nocase; http_header; classtype:policy-violation;)
-alert http any any -> any any (msg:"ET POLICY User-Agent ABUSE - scanner"; sid:2000004; rev:1; flow:to_server; content:"User-Agent|3A| Nmap"; nocase; http_header; classtype:policy-violation;)
+# User-Agent ベースの検知とブロック（拡張）
+drop http any any -> any any (msg:"ET POLICY User-Agent ABUSE - curl"; sid:2000001; rev:1; flow:to_server; content:"User-Agent|3A| curl"; nocase; http_header; classtype:policy-violation;)
+drop http any any -> any any (msg:"ET POLICY User-Agent ABUSE - wget"; sid:2000002; rev:1; flow:to_server; content:"User-Agent|3A| wget"; nocase; http_header; classtype:policy-violation;)
+drop http any any -> any any (msg:"ET POLICY User-Agent ABUSE - python-requests"; sid:2000003; rev:1; flow:to_server; content:"User-Agent|3A| python-requests"; nocase; http_header; classtype:policy-violation;)
+drop http any any -> any any (msg:"ET POLICY User-Agent ABUSE - scanner"; sid:2000004; rev:1; flow:to_server; content:"User-Agent|3A| Nmap"; nocase; http_header; classtype:policy-violation;)
 
-# パスベースの検知（拡張）
+# パスベースの検知（alertのみ - 通常のアクセスなのでdropしない）
 alert http any any -> any any (msg:"Test HTTP Access"; content:"/test"; http_uri; sid:1000001; rev:1;)
 alert http any any -> any any (msg:"Admin Access Attempt"; content:"/admin"; http_uri; sid:1000002; rev:1;)
 alert http any any -> any any (msg:"API Access"; content:"/api/"; http_uri; sid:1000003; rev:1;)
 
-# ===== Injection Attack Detection =====
-# SQLインジェクション検知（強化版）
-alert http any any -> any any (msg:"Possible SQL Injection - OR 1=1"; content:"OR 1=1"; nocase; http_uri; sid:1000004; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"SQL Injection - UNION SELECT"; content:"UNION SELECT"; nocase; http_uri; sid:1000005; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"SQL Injection - Comment"; content:"--"; http_uri; sid:1000006; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"SQL Injection - DROP TABLE"; content:"DROP TABLE"; nocase; http_uri; sid:1000014; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"SQL Injection - INSERT INTO"; content:"INSERT INTO"; nocase; http_uri; sid:1000015; rev:1; classtype:web-application-attack;)
+# ===== Injection Attack Detection (DROP) =====
+# SQLインジェクション検知とブロック（強化版）
+drop http any any -> any any (msg:"Possible SQL Injection - OR 1=1"; content:"OR 1=1"; nocase; http_uri; sid:1000004; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"SQL Injection - UNION SELECT"; content:"UNION SELECT"; nocase; http_uri; sid:1000005; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"SQL Injection - Comment"; content:"--"; http_uri; sid:1000006; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"SQL Injection - DROP TABLE"; content:"DROP TABLE"; nocase; http_uri; sid:1000014; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"SQL Injection - INSERT INTO"; content:"INSERT INTO"; nocase; http_uri; sid:1000015; rev:1; classtype:web-application-attack;)
 
-# XSS攻撃検知
-alert http any any -> any any (msg:"XSS Attack - Script Tag"; content:"<script"; nocase; http_uri; sid:1000016; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"XSS Attack - JavaScript"; content:"javascript:"; nocase; http_uri; sid:1000017; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"XSS Attack - OnLoad Event"; content:"onload="; nocase; http_uri; sid:1000018; rev:1; classtype:web-application-attack;)
+# XSS攻撃検知とブロック
+drop http any any -> any any (msg:"XSS Attack - Script Tag"; content:"<script"; nocase; http_uri; sid:1000016; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"XSS Attack - JavaScript"; content:"javascript:"; nocase; http_uri; sid:1000017; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"XSS Attack - OnLoad Event"; content:"onload="; nocase; http_uri; sid:1000018; rev:1; classtype:web-application-attack;)
 
-# ===== Directory Traversal (Enhanced) =====
-alert http any any -> any any (msg:"Directory Traversal - Basic"; content:"../"; http_uri; sid:1000007; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"Path Traversal - etc/passwd"; content:"/etc/passwd"; nocase; http_uri; sid:1000008; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"Path Traversal - Encoded"; content:"%2e%2e%2f"; http_uri; sid:1000011; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"Path Traversal - Double Encoded"; content:"%252e%252e%252f"; http_uri; sid:1000012; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"Path Traversal - Backslash"; content:"..\\"; http_uri; sid:1000019; rev:1; classtype:web-application-attack;)
+# ===== Directory Traversal (DROP) =====
+drop http any any -> any any (msg:"Directory Traversal - Basic"; content:"../"; http_uri; sid:1000007; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"Path Traversal - etc/passwd"; content:"/etc/passwd"; nocase; http_uri; sid:1000008; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"Path Traversal - Encoded"; content:"%2e%2e%2f"; http_uri; sid:1000011; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"Path Traversal - Double Encoded"; content:"%252e%252e%252f"; http_uri; sid:1000012; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"Path Traversal - Backslash"; content:"..\\"; http_uri; sid:1000019; rev:1; classtype:web-application-attack;)
 
-# ===== Sensitive File Access =====
-alert http any any -> any any (msg:"Sensitive File Access - shadow"; content:"/etc/shadow"; nocase; http_uri; sid:1000009; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"Configuration File Access"; content:".conf"; http_uri; sid:1000010; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"SSH Key Access"; content:"id_rsa"; http_uri; sid:1000020; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"Environment File Access"; content:".env"; http_uri; sid:1000021; rev:1; classtype:web-application-attack;)
+# ===== Sensitive File Access (DROP) =====
+drop http any any -> any any (msg:"Sensitive File Access - shadow"; content:"/etc/shadow"; nocase; http_uri; sid:1000009; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"Configuration File Access"; content:".conf"; http_uri; sid:1000010; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"SSH Key Access"; content:"id_rsa"; http_uri; sid:1000020; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"Environment File Access"; content:".env"; http_uri; sid:1000021; rev:1; classtype:web-application-attack;)
 
-# ===== DoS Attack Detection =====
-alert http any any -> any any (msg:"HTTP DoS - Too Many Requests"; threshold:type both, track by_src, count 50, seconds 60; sid:1000022; rev:1; classtype:attempted-dos;)
+# ===== DoS Attack Detection (DROP) =====
+drop http any any -> any any (msg:"HTTP DoS - Too Many Requests"; threshold:type both, track by_src, count 50, seconds 60; sid:1000022; rev:1; classtype:attempted-dos;)
 
-# ===== Malicious Headers =====
-alert http any any -> any any (msg:"Malicious X-Forwarded-For Header"; content:"X-Forwarded-For|3A| <script"; nocase; http_header; sid:1000023; rev:1; classtype:web-application-attack;)
-alert http any any -> any any (msg:"Long Header Attack"; dsize:>8192; http_header; sid:1000024; rev:1; classtype:web-application-attack;)
+# ===== Malicious Headers (DROP) =====
+drop http any any -> any any (msg:"Malicious X-Forwarded-For Header"; content:"X-Forwarded-For|3A| <script"; nocase; http_header; sid:1000023; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"Long Header Attack"; dsize:>8192; http_header; sid:1000024; rev:1; classtype:web-application-attack;)
+
+# ===== Additional IPS Rules =====
+# 重複してはいけない攻撃パターン
+drop http any any -> any any (msg:"Brute Force Login Attempt"; content:"password="; http_client_body; threshold:type both, track by_src, count 10, seconds 60; sid:1000025; rev:1; classtype:attempted-admin;)
+drop http any any -> any any (msg:"Common Exploit Path"; content:"/wp-admin/"; http_uri; sid:1000026; rev:1; classtype:web-application-attack;)
+drop http any any -> any any (msg:"Common Exploit Path"; content:"/phpmyadmin/"; http_uri; sid:1000027; rev:1; classtype:web-application-attack;)
