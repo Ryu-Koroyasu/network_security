@@ -1,0 +1,10 @@
+[
+  {
+    "timestamp": "2025-07-25T15:25:05.928775",
+    "attack_type": "Basic Connection",
+    "url": "http://172.18.14.76:8080",
+    "status_code": 408,
+    "response_time": 10,
+    "blocked": true
+  }
+]

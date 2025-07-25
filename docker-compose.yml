@@ -1,11 +1,13 @@
 # docker-compose.yml
+# Network Security System - Suricata IDS + Host-based Fail2ban
+# Fail2banはホストOSで動作するため、このcompose設定には含まれません
 services:
   nginx:
     build:
       context: ./nginx
-      dockerfile: Dockerfile # 必要に応じてDockerfileを分ける
+      dockerfile: Dockerfile
     container_name: nginx_proxy
-    # NginxのアクセスログとエラーログをSuricataとFail2banが共有できるようにボリュームマウント
+    # Nginxのアクセスログ - ホスト側Fail2banが監視
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro  # SSL証明書をマウント
@@ -47,27 +49,10 @@ services:
     privileged: true    # ホストネットワークアクセスに必要
     restart: unless-stopped
 
-  fail2ban:
-    build:
-      context: ./fail2ban
-      dockerfile: Dockerfile
-    container_name: fail2ban_protection
-    volumes:
-      - nginx_logs:/var/log/nginx:ro      # Nginxログへの読み取り専用アクセス
-      - suricata_logs:/var/log/suricata:ro # Suricataログへの読み取り専用アクセス
-      - /var/run/docker.sock:/var/run/docker.sock  # Docker APIアクセス（必要に応じて）
-    cap_add:
-      - NET_ADMIN  # iptables操作に必要
-      - NET_RAW    # ネットワーク操作に必要
-    network_mode: host  # ホストのネットワークスタックへのアクセス
-    privileged: true    # iptables操作に必要
-    restart: unless-stopped
-
 # 永続化のためのボリューム定義
 volumes:
-  nginx_logs: # Nginxログ用
-  suricata_logs: # Suricataログ用
-  # fail2ban_logs: # Fail2banはホストOSにインストールするため削除
+  nginx_logs: # Nginxログ用（ホスト側Fail2banが監視）
+  suricata_logs: # Suricataログ用（ホスト側Fail2banが監視）
 
 # ネットワーク定義
 networks:

@@ -30,8 +30,10 @@ network_security/
 ├── 🐳 Docker関連ディレクトリ/
 │   ├── nginx/                     # Nginxリバースプロキシ
 │   ├── flask_app/                 # Flaskバックエンド
-│   ├── suricata/                  # Suricata IDS/IPS
-│   └── fail2ban/                  # Fail2ban IPS
+│   └── suricata/                  # Suricata IDS/IPS
+│   
+├── ⚙️ host-fail2ban/              # ホスト側Fail2ban設定（実稼働）
+├── 📦 archive/                    # 廃止されたDocker実装アーカイブ
 │
 ├── 📊 evaluation/                  # 実験評価・分析
 │   ├── *.py                       # データ分析スクリプト
@@ -44,9 +46,9 @@ network_security/
 │   └── *.json                     # 結果レポート
 │
 └── ⚙️ host-fail2ban/              # ホスト側Fail2ban設定
-    ├── jail.local
-    ├── suricata-fast.conf
-    └── suricata-severe.conf
+    ├── jail.local                 # Fail2ban jail設定
+    ├── suricata-fast.conf         # Suricataアラートフィルター
+    └── suricata-severe.conf       # 重大アラートフィルター
 ```
 
 ## 🚀 使用方法
@@ -97,6 +99,11 @@ docker compose up -d
 - `WSL_EXTERNAL_ACCESS_SETUP.md` → `WSL_SETUP_GUIDE.md`に統合
 - `VALIDATION_GUIDE.md` → `VALIDATION_COMPLETE.md`に統合
 - `VALIDATION_REPORT.md` → `VALIDATION_COMPLETE.md`に統合
+
+### Docker Fail2ban実装の削除（2025-07-25）
+- `fail2ban/` ディレクトリ → `archive/fail2ban_docker_deprecated`に移動
+- Docker Compose設定からfail2banサービスを削除
+- ホスト側Fail2ban実装に完全移行
 
 ### バックアップ・一時ファイル
 - `*.backup`, `*.json`, `*.csv`, `*.png`（ルート）
