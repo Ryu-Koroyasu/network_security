@@ -65,7 +65,7 @@ source .venv/bin/activate  # Linux/Mac
 pip install requests
 
 # 攻撃シミュレーション実行
-python advanced_attack_simulator.py
+python attack_simulator.py all
 ```
 
 ## 📊 実証実験結果
